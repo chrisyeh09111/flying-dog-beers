@@ -21,23 +21,6 @@ import dash_html_components as html
 available_indicators = df['name'].unique()
 
 available_indicators1 = ['p','as','ac','ad','asd','d']
-name_map = {
-    'as': 'Average Score',
-    'ac': 'Number of Plays',
-    'd': 'Total Play Time (secs)',
-    'ad': 'Average Play Time (secs)',
-    'p': 'Progress Through Curriculum',
-    'wc': 'Number of Words Learned',
-    'add': 'Average Daily Play Time (secs)',
-    'asd': 'Average Student Play Time (secs)',
-    # 'cp': 'Child Progress',  NOTE: commenting out as is "private"/internal.
-    'ss': 'Number of Students',     
-    'cc': 'Number of Classes',
-    'tt': 'Number of Teachers',
-    'xx': 'Number of Schools',
-    'k': 'timestamp',
-    'day':'day'
-}
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
@@ -56,7 +39,9 @@ app.layout = html.Div([
                 value='GN_L3_B'
             ),dcc.RadioItems(
                 id='xaxis-column',
-                options=[{'label': name_map[i], 'value': i} for i in available_indicators1],
+                options=[{'label': 'Progress Through Curriculum', 'value': 'p'},{'label': 'Average Score', 'value': 'as'}
+                         ,{'label': 'Number of Plays', 'value': 'ac'},{'label': 'Average Play Time (secs)', 'value': 'ad'}
+                        ,{'label': 'Average Student Play Time (secs)', 'value': 'asd'}, {'label': 'Total Play Time (secs)', 'value': 'd'}],
                 value='as'
             )
                        
