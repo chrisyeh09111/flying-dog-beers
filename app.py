@@ -3,72 +3,81 @@ import json
 import os
 import datetime
 import pandas as pd
-data=pd.read_csv('https://raw.githubusercontent.com/chrisyeh09111/flying-dog-beers/master/export_dataframe_cut.csv')
-data['date'] = pd.to_datetime(data.date, unit='ms')
-data['date1']=data['date'].apply(lambda x:pd.to_datetime(x).date())
-data['year']=data['date1'].apply(lambda x :x.year)
-data['month']=data['date1'].apply(lambda x :x.month)
-# data['month_year'] = pd.to_datetime(data['date']).dt.to_period('M')
-data=data.groupby(['year','month','date1']).agg({'dur':['sum','count','mean','nunique'], 'scr':['mean']})
-data.reset_index(inplace=True) 
-data['total_dur']=data['dur']['sum']
-data['no_of_plays']=data['dur']['count']
-data['avg_play_time_per_day']=data['dur']['mean']
-data['mean_score']=data['scr']['mean']
-data['number_of_students']=data['dur']['nunique']
-data['avg_play_day']=data['no_of_plays']/data['number_of_students']
+# dbi = dynamo.DBInterface(profile_name='prod', n_processes=8)
+
+# # ss = dbi.students.all('phone,name,aggregates,class_code,student_pin,teacher,schoolCode')
+# user_store = dbi.classes.get_by_school(
+#             school_code='ZGOBJP',
+#             projection='code,schoolCode,aggregates')
+# os.chdir('C:/Users/chris/Desktop/studycat')
+# with open('Copy of rise_2020-04-08.json') as f:
+#     data = json.loads(f.read())
+# data=data[0]
+df = pd.read_csv('https://raw.githubusercontent.com/chrisyeh09111/flying-dog-beers/master/hello.csv')
+df['aggregates']=df['aggregates'].apply(lambda x:json.loads(x.replace("\'","\"")))
+
 
 import dash_core_components as dcc
 import dash_html_components as html
-import json
-available_indicators = ['total_dur','no_of_plays','avg_play_time_per_day','mean_score','avg_play_day','number_of_students']
+available_indicators = df['name'].unique()
+
+available_indicators1 = ['p','as','ac','ad','asd','d']
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.layout = html.Div([
-            dcc.Dropdown(
+    dcc.Tabs(id='tabs-example', value='daily', children=[
+        dcc.Tab(label='Daily', value='daily'),
+        dcc.Tab(label='Weekly', value='weekly'),
+        dcc.Tab(label='Monthly', value='monthly'),        
+    ]),
+    
+    
+    
+    dcc.Dropdown(
                 id='yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                value='total_dur'
-            )
-    ,
-
-    dcc.Graph(id='indicator-graphic'),
-
-    dcc.Slider(
+                value='GN_L3_B'
+            ),dcc.RadioItems(
                 id='xaxis-column',
-                        
-                min=data['year'].min(),
-                max=data['year'].max(),
-                marks={str(year): str(year) for year in data['year'].unique()},
-                step=None,
-                value= 2019
-            ),
-    dcc.Slider(
-                id='zaxis-column',
-                        
-                min=data['month'].min(),
-                max=data['month'].max(),
-                marks={str(year): str(year) for year in data['month'].unique()},
-                step=None,
-                value= 1
+                options=[{'label': i, 'value': i} for i in available_indicators1],
+                value='as'
             )
+                       
+                       
+                       
+                       
+                       
+                       ,
+                dcc.Graph(id='indicator-graphic')
+    
+            
+    
 ])
 @app.callback(
     dash.dependencies.Output('indicator-graphic', 'figure'),
     [
      dash.dependencies.Input('yaxis-column', 'value'),
-     dash.dependencies.Input('xaxis-column', 'value'),
-     dash.dependencies.Input('zaxis-column', 'value')   
+     dash.dependencies.Input('xaxis-column', 'value'),   
+     dash.dependencies.Input('tabs-example', 'value')
     ])
-def update_graph( yaxis_column_name,xaxis_column_name,zaxis_column_name):
-    df=data[data['year']==xaxis_column_name]
-    df=df[df['month']==zaxis_column_name]
+def update_graph(yaxis_column, xaxis_column, tabs_exp):
+
+    df1 = df[df['name']==yaxis_column]
     
+    df1 = df1.reset_index()['aggregates'][0][tabs_exp]
+    df1=pd.DataFrame(df1)
+    if tabs_exp=='monthly':
+        temp='m'
+        df1['m']=df1['m'].apply(lambda x :int(x[-2:]))
+    elif tabs_exp=='weekly':
+        temp='w'
+    else:
+        temp= 'day'
     return {
         'data': [
-               {'x': df['date1'], 'y':df[yaxis_column_name], 'type': 'bar', 'name': 'SF'},
+               {'x': df1[temp], 'y':df1[xaxis_column], 'type': 'bar', 'name': 'SF'},
             ],
         'layout': {'title': 'Dash Data Visualization'
                    
