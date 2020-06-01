@@ -39,9 +39,17 @@ app.layout = html.Div([
                 value='GN_L3_B'
             ),dcc.RadioItems(
                 id='xaxis-column',
-                options=[{'label': i, 'value': i} for i in available_indicators1],
+                options=[{'label': 'Progress Through Curriculum', 'value': 'p'},{'label': 'Average Score', 'value': 'as'}
+                         ,{'label': 'Number of Plays', 'value': 'ac'},{'label': 'Average Play Time (secs)', 'value': 'ad'}
+                        ,{'label': 'Average Student Play Time (secs)', 'value': 'asd'}, {'label': 'Total Play Time (secs)', 'value': 'd'}],
                 value='as'
-            ),
+            )
+                       
+                       
+                       
+                       
+                       
+                       ,
                 dcc.Graph(id='indicator-graphic')
     
             
