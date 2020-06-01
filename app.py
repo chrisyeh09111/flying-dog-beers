@@ -21,7 +21,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 available_indicators = df['name'].unique()
 
-available_indicators1 = ['p','as','ac','ad','asd','d']
+available_indicators1 = ['Progress Through Curriculum','Average Score','Number of Plays','Average Play Time (secs)','Average Student Play Time (secs)','Total Play Time (secs)']
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
