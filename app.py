@@ -3,6 +3,7 @@ import json
 import os
 import datetime
 import pandas as pd
+import boto3
 # dbi = dynamo.DBInterface(profile_name='prod', n_processes=8)
 
 # # ss = dbi.students.all('phone,name,aggregates,class_code,student_pin,teacher,schoolCode')
@@ -15,14 +16,28 @@ import pandas as pd
 # data=data[0]
 df = pd.read_csv('https://raw.githubusercontent.com/chrisyeh09111/flying-dog-beers/master/hello.csv')
 df['aggregates']=df['aggregates'].apply(lambda x:json.loads(x.replace("\'","\"")))
-
-
 import dash_core_components as dcc
 import dash_html_components as html
 available_indicators = df['name'].unique()
 
-available_indicators1 = ['Progress Through Curriculum','Average Score','Number of Plays','Average Play Time (secs)','Average Student Play Time (secs)','Total Play Time (secs)']
-
+available_indicators1 = ['p','as','ac','ad','asd','d']
+name_map = {
+    'as': 'Average Score',
+    'ac': 'Number of Plays',
+    'd': 'Total Play Time (secs)',
+    'ad': 'Average Play Time (secs)',
+    'p': 'Progress Through Curriculum',
+    'wc': 'Number of Words Learned',
+    'add': 'Average Daily Play Time (secs)',
+    'asd': 'Average Student Play Time (secs)',
+    # 'cp': 'Child Progress',  NOTE: commenting out as is "private"/internal.
+    'ss': 'Number of Students',     
+    'cc': 'Number of Classes',
+    'tt': 'Number of Teachers',
+    'xx': 'Number of Schools',
+    'k': 'timestamp',
+    'day':'day'
+}
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
@@ -41,7 +56,7 @@ app.layout = html.Div([
                 value='GN_L3_B'
             ),dcc.RadioItems(
                 id='xaxis-column',
-                options=[{'label': i, 'value': i} for i in available_indicators1],
+                options=[{'label': name_map[i], 'value': i} for i in available_indicators1],
                 value='as'
             )
                        
